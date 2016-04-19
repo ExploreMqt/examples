@@ -20,6 +20,13 @@ function main(sources) {
   const otherRequest$ = Observable.interval(1000).take(2)
     .map(() => 'http://www.google.com');
 
+  const selectedResult$ = sources.DOM.select('.search-results').events('click')
+							.doOnNext(ev => ev.preventDefault())
+							.map(ev => {
+								alert('a list item!')
+								// return ev.currentTarget.attributes.href.value
+							})
+
   // Convert the stream of HTTP responses to virtual DOM elements.
   const vtree$ = sources.HTTP
     .filter(res$ => res$.request.category === 'github')
@@ -32,8 +39,8 @@ function main(sources) {
         input({className: 'field', attributes: {type: 'text'}}),
         hr(),
         ul({className: 'search-results'}, results.map(result =>
-          li({className: 'search-result'}, [
-            a({href: result.html_url}, result.name)
+          li({className: 'search-result', 'data-result': result}, [
+            result.name
           ])
         ))
       ])
